@@ -53,13 +53,13 @@ if (fs.existsSync(SAVE_FILE)) {
 function savePixels() {
   fs.writeFileSync(SAVE_FILE, JSON.stringify(pixels));
 }
-function saveLoc() {
+function saveLoc(a,b) {
   if (fs.existsSync(SAVE_FILE2)) {
   try {
     const saved = JSON.parse(fs.readFileSync(SAVE_FILE2));
     if(Object.keys(pixels).length<50){
     heys = saved;}
-    
+    heys[a]=b;
     console.log("Loaded saved pixels:", Object.keys(pixels).length);
   } catch (e) {
     console.error("Error loading pixels.json:", e);
@@ -78,8 +78,8 @@ io.on('connection', socket => {
   socket.emit('pixels:init', allPixels);
   socket.on('pixels:siteload', ({lon,lat,addres}) => {
     var kes=`${lon},${lat}`;
-    heys[kes]=addres;
-    saveLoc()
+    
+    saveLoc(kes,addres)
     console.log("Client requested initial pixel data" + socket.id, "at", lon, lat);
     // Send all pixels when site loads
     
@@ -98,6 +98,7 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
 
