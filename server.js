@@ -33,7 +33,7 @@ app.get('/loc', (req, res) => {
 
 const SAVE_FILE = path.join(__dirname, 'pixels.json');
 
-const SAVE_FILE2 = path.join(__dirname, 'location.json');
+//const SAVE_FILE2 = path.join(__dirname, 'location.json');
 let pixels = {}; // key "lon,lat" -> color
 
 // Load saved pixels if file exists
@@ -53,7 +53,7 @@ if (fs.existsSync(SAVE_FILE)) {
 function savePixels() {
   fs.writeFileSync(SAVE_FILE, JSON.stringify(pixels));
 }
-function saveLoc(a,b) {
+/*function saveLoc(a,b) {
   if (fs.existsSync(SAVE_FILE2)) {
   try {
     const saved = JSON.parse(fs.readFileSync(SAVE_FILE2));
@@ -66,7 +66,7 @@ function saveLoc(a,b) {
   }
 }
   fs.writeFileSync(SAVE_FILE2, JSON.stringify(heys));
-}
+}*/
 io.on('connection', socket => {
   console.log("Client connected",socket.id,socket.handshake.address);
   console.log("Total pixels:", Object.keys(pixels).length);
@@ -76,14 +76,14 @@ io.on('connection', socket => {
     return { lon: +lon, lat: +lat, color };
   });
   socket.emit('pixels:init', allPixels);
-  socket.on('pixels:siteload', ({lon,lat,addres}) => {
+  /*socket.on('pixels:siteload', ({lon,lat,addres}) => {
     var kes=`${lon},${lat}`;
     
     saveLoc(kes,addres)
     console.log("Client requested initial pixel data" + socket.id, "at", lon, lat);
     // Send all pixels when site loads
     
-  });
+  });*/
   // Handle placing a pixel
   socket.on('pixel:place', ({lon,lat,color}) => {
     const key = `${lon},${lat}`;
@@ -98,6 +98,7 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
 
