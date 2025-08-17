@@ -17,19 +17,32 @@ let pixels = {}; // key "lon,lat" -> color
 // Load saved pixels if file exists
 if (fs.existsSync(SAVE_FILE)) {
   try {
-    const saved = JSON.parse(fs.readFileSync(SAVE_FILE));
+    var saved = JSON.parse(fs.readFileSync(SAVE_FILE));
     pixels = saved;
+    saved=0;
     console.log("Loaded saved pixels:", Object.keys(pixels).length);
   } catch (e) {
     console.error("Error loading pixels.json:", e);
   }
 }
 
+
 // Function to save pixels to file
 function savePixels() {
   fs.writeFileSync(SAVE_FILE, JSON.stringify(pixels));
 }
 function saveLoc() {
+  if (fs.existsSync(SAVE_FILE2)) {
+  try {
+    const saved = JSON.parse(fs.readFileSync(SAVE_FILE));
+    if(Object.keys(pixels).length<50){
+    heys = saved;}
+    
+    console.log("Loaded saved pixels:", Object.keys(pixels).length);
+  } catch (e) {
+    console.error("Error loading pixels.json:", e);
+  }
+}
   fs.writeFileSync(SAVE_FILE2, JSON.stringify(heys));
 }
 io.on('connection', socket => {
@@ -63,4 +76,5 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
