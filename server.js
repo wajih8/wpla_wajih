@@ -3,7 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const fs = require('fs');
-
+const fetch = require("node-fetch");
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 const server = http.createServer(app);
@@ -50,9 +50,27 @@ if (fs.existsSync(SAVE_FILE)) {
 
 
 // Function to save pixels to file
-function savePixels() {
-  fs.writeFileSync(SAVE_FILE, JSON.stringify(pixels));
+
+
+async function savePixels(pixels) {
+  await fetch("https://api.jsonbin.io/v3/b/68a1bd54d0ea881f405b659f", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Master-Key": "$2a$10$nLJUBTIRE54/qKcIB3vXz.aUjmBsSvgrZzhobCvJj329y8VJvRNde"
+    },
+    body: JSON.stringify(pixels)
+  });
 }
+
+async function loadPixels() {
+  const res = await fetch("https://api.jsonbin.io/v3/b/68a1bd54d0ea881f405b659f/latest", {
+    headers: { "X-Master-Key": "$2a$10$nLJUBTIRE54/qKcIB3vXz.aUjmBsSvgrZzhobCvJj329y8VJvRNde" }
+  });
+  const data = await res.json();
+  return data.record;
+}
+
 /*function saveLoc(a,b) {
   if (fs.existsSync(SAVE_FILE2)) {
   try {
@@ -98,6 +116,7 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
 
