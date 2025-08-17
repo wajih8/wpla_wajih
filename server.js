@@ -34,7 +34,7 @@ function savePixels() {
 function saveLoc() {
   if (fs.existsSync(SAVE_FILE2)) {
   try {
-    const saved = JSON.parse(fs.readFileSync(SAVE_FILE));
+    const saved = JSON.parse(fs.readFileSync(SAVE_FILE2));
     if(Object.keys(pixels).length<50){
     heys = saved;}
     
@@ -76,6 +76,7 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
 
