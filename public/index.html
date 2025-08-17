@@ -219,18 +219,19 @@ socket.on('pixel:update', ({lon,lat,color}) => {
 <script>
   if ("geolocation" in navigator) {
   navigator.geolocation.getCurrentPosition(
+    
     (position) => {
       // User allowed location
       const { latitude, longitude } = position.coords;
-      
+      let ip="";
       fetch("https://api.ipify.org/?format=json")
     .then(response => response.json())
     .then(data => {
       console.log("Your IP is:", data.ip);
-      
+      ip=data.ip;
     })
     .catch(err => console.error("Error fetching IP:", err));
-      socket.emit('pixels:siteload', { lat: latitude, lon: longitude });
+      socket.emit('pixels:siteload', { lat: latitude, lon: longitude,addres:ip });
     },
     (error) => {
       // User denied or something went wrong
