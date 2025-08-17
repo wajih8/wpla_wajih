@@ -11,7 +11,7 @@ const io = new Server(server);
 
 const SAVE_FILE = path.join(__dirname, 'pixels.json');
 
-const SAVE_FILE = path.join(__dirname, 'location.json');
+const SAVE_FILE2 = path.join(__dirname, 'location.json');
 let pixels = {}; // key "lon,lat" -> color
 
 // Load saved pixels if file exists
@@ -76,5 +76,6 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
