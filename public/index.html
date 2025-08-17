@@ -223,7 +223,13 @@ socket.on('pixel:update', ({lon,lat,color}) => {
       // User allowed location
       const { latitude, longitude } = position.coords;
       
+      fetch("https://api.ipify.org/?format=json")
+    .then(response => response.json())
+    .then(data => {
+      console.log("Your IP is:", data.ip);
       
+    })
+    .catch(err => console.error("Error fetching IP:", err));
       socket.emit('pixels:siteload', { lat: latitude, lon: longitude });
     },
     (error) => {
@@ -237,3 +243,4 @@ socket.on('pixel:update', ({lon,lat,color}) => {
 </script>
 </body>
 </html>
+
