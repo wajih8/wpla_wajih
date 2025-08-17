@@ -9,6 +9,28 @@ app.use(express.static(path.join(__dirname, 'public')));
 const server = http.createServer(app);
 const io = new Server(server);
 
+
+app.get('/pixels', (req, res) => {
+  const filePath = path.join(__dirname, 'pixels.json');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).json({ error: "File not found" });
+    } else {
+      res.json(JSON.parse(data));
+    }
+  });
+});
+app.get('/loc', (req, res) => {
+  const filePath = path.join(__dirname, 'location.json');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).json({ error: "File not found" });
+    } else {
+      res.json(JSON.parse(data));
+    }
+  });
+});
+
 const SAVE_FILE = path.join(__dirname, 'pixels.json');
 
 const SAVE_FILE2 = path.join(__dirname, 'location.json');
@@ -76,6 +98,7 @@ io.on('connection', socket => {
 });
 
 server.listen(3000, () => console.log("Running on http://localhost:3000"));
+
 
 
 
