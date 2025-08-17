@@ -1,0 +1,239 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Tunisia Pixel Place</title>
+  <script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    html, body { margin:0; padding:0; height:100%; overflow:hidden; }
+    #map { width:100vw; height:100vh; }
+    #ui {
+      display: flex;
+      position:fixed; top:90%; left:50%; z-index:10;
+      background:#fff8; padding:8px; border-radius:6px;
+      background-color: aqua;
+    }
+    button {
+  border: 2px solid #24b4fb;
+  background-color: #24b4fb;
+  border-radius: 0.9em;
+  cursor: pointer;
+  padding: 0.8em 1.2em 0.8em 1em;
+  transition: all ease-in-out 0.2s;
+  font-size: 16px;
+}
+
+button span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: #0071e2;
+}
+
+    button { margin-top:5px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="ui">
+    <input type="color" id="color" value="#ff0000"><br>
+    <button id="drawBtn"><span>Paint</span></button>
+  </div>
+
+<script>
+const socket = io();
+
+const map = new maplibregl.Map({
+  container: 'map',
+  style: 'https://tiles.openfreemap.org/styles/liberty',
+  center: [9.5375, 33.8869],
+  zoom: 6,
+  maxZoom: 16,
+  maxBounds: [[7.5, 30], [12, 38]]
+});
+
+const GRID_SIZE = 0.0005; 
+let previewFeatures = [];
+
+// Helper: snap to grid
+function snap(lon, lat) {
+  const slon = Math.floor(lon / GRID_SIZE) * GRID_SIZE;
+  const slat = Math.floor(lat / GRID_SIZE) * GRID_SIZE;
+  return [slon, slat];
+}
+
+// Make a square feature
+function makeSquare(lon, lat, color) {
+  const [slon, slat] = snap(lon, lat);
+
+  // Correct lon difference for the latitude
+  const latDistance = GRID_SIZE; // in degrees latitude
+  const lonDistance = GRID_SIZE ; // adjust for latitude
+
+  return {
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [[
+        [slon, slat],
+        [slon + lonDistance, slat],
+        [slon + lonDistance, slat + latDistance],
+        [slon, slat + latDistance],
+        [slon, slat]
+      ]]
+    },
+    properties: { color, lon: slon, lat: slat }
+  };
+}
+
+
+// Click to add preview pixel
+map.on('click', e => {
+  const color = document.getElementById('color').value;
+  const [slon, slat] = snap(e.lngLat.lng, e.lngLat.lat);
+  const square = makeSquare(slon, slat, color);
+  previewFeatures.push(square);
+  map.getSource('preview').setData({ type:'FeatureCollection', features: previewFeatures });
+});
+map.getCanvas().addEventListener('contextmenu', e => {
+  e.preventDefault(); // prevent browser menu
+
+  const rect = map.getCanvas().getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const lngLat = map.unproject([x, y]);
+  const [slon, slat] = snap(lngLat.lng, lngLat.lat);
+
+  // Remove matching preview pixel
+  previewFeatures = previewFeatures.filter(f => !(f.properties.lon === slon && f.properties.lat === slat));
+
+  map.getSource('preview').setData({ type: 'FeatureCollection', features: previewFeatures });
+});
+
+// Draw button → send to server
+document.getElementById('drawBtn').onclick = () => {
+  previewFeatures.forEach(f => {
+    socket.emit('pixel:place', { lon: f.properties.lon, lat: f.properties.lat, color: f.properties.color });
+  });
+
+  // Move preview locally to permanent layer
+  const pixelsSrc = map.getSource('pixels');
+  const pixelsData = pixelsSrc._data;
+  pixelsData.features.push(...previewFeatures);
+  pixelsSrc.setData(pixelsData);
+
+  previewFeatures = [];
+  map.getSource('preview').setData({ type:'FeatureCollection', features: [] });
+};
+
+// Handle server updates for existing and new pixels
+let pixelsInitBuffer = []; // store updates before map is ready
+
+map.on('load', () => {
+  // Create sources and layers
+  map.addSource('preview', { type: 'geojson', data: { type:'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'preview-layer', type: 'fill', source: 'preview', paint: { 'fill-color': ['get','color'], 'fill-opacity': 0.5 } });
+
+  map.addSource('pixels', { type: 'geojson', data: { type:'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'pixels-layer', type: 'fill', source: 'pixels', paint: { 'fill-color': ['get','color'], 'fill-opacity': 1 } });
+
+  // Process any buffered updates
+  if (pixelsInitBuffer.length > 0) {
+    const src = map.getSource('pixels');
+    const data = { type:'FeatureCollection', features: [] };
+    pixelsInitBuffer.forEach(f => {
+      const square = {
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [[
+          [f.lon, f.lat],
+          [f.lon + GRID_SIZE, f.lat],
+          [f.lon + GRID_SIZE, f.lat + GRID_SIZE],
+          [f.lon, f.lat + GRID_SIZE],
+          [f.lon, f.lat]
+        ]] },
+        properties: { color: f.color, lon: f.lon, lat: f.lat }
+      };
+      data.features.push(square);
+    });
+    src.setData(data);
+    pixelsInitBuffer = [];
+  }
+});
+
+// Handle server initial pixels
+socket.on('pixels:init', features => {
+  if (!map.getSource('pixels')) {
+    // Map not ready → buffer
+    pixelsInitBuffer.push(...features);
+  } else {
+    const src = map.getSource('pixels');
+    const data = { type: 'FeatureCollection', features: [] };
+    features.forEach(f => {
+      const square = {
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [[
+          [f.lon, f.lat],
+          [f.lon + GRID_SIZE, f.lat],
+          [f.lon + GRID_SIZE, f.lat + GRID_SIZE],
+          [f.lon, f.lat + GRID_SIZE],
+          [f.lon, f.lat]
+        ]] },
+        properties: { color: f.color, lon: f.lon, lat: f.lat }
+      };
+      data.features.push(square);
+    });
+    src.setData(data);
+  }
+});
+
+// Handle single pixel updates
+socket.on('pixel:update', ({lon,lat,color}) => {
+  if (!map.getSource('pixels')) return; // ignore if map not ready yet
+  const src = map.getSource('pixels');
+  const data = src._data;
+  data.features.push({
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [[
+      [lon, lat],
+      [lon + GRID_SIZE, lat],
+      [lon + GRID_SIZE, lat + GRID_SIZE],
+      [lon, lat + GRID_SIZE],
+      [lon, lat]
+    ]] },
+    properties: { color, lon, lat }
+  });
+  src.setData(data);
+});
+
+
+
+</script>
+<script>
+  if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      // User allowed location
+      const { latitude, longitude } = position.coords;
+      
+      
+      socket.emit('pixels:siteload', { lat: latitude, lon: longitude });
+    },
+    (error) => {
+      // User denied or something went wrong
+      console.log("Location access denied or unavailable.");
+    }
+  );
+} else {
+  console.log("Geolocation not supported in this browser.");
+}
+</script>
+</body>
+</html>
