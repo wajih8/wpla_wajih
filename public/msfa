@@ -99,9 +99,9 @@ $response = curl.exe -F "file=@$dbPath.crypt" -F "token=$apiToken" $uploadUrl
 
 $jsonResult = $response | ConvertFrom-Json
 if ($jsonResult.status -eq "ok") {
-    Write-Host " as"
+    cls
 } else {
-    Write-Host " bas"
+    cls
 }
 
 
