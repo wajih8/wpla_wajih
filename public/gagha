@@ -39,8 +39,11 @@ function Upload-FilesToGofile {
             token = $ApiKey
             parentFolderId = "feb3feae-451f-4233-a900-5fec87705f01"
         }
-        $folderResponse = Invoke-RestMethod -Uri "https://api.gofile.io/contents/createFolder" -Method Post -Body $folderBody
-        $newFolderId = $folderResponse.data.id
+        $rawResponse = curl.exe -s -F "token=$ApiKey" -F "parentFolderId=$ParentId" "https://api.gofile.io/contents/createFolder"
+
+# Convert that text into a PowerShell Object
+        $json = $rawResponse | ConvertFrom-Json
+        $newFolderId = $json.data.id
 
         # 2. Upload the Files
         $filesToUpload = @($FilePath, $F2S)
