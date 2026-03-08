@@ -1,0 +1,8 @@
+Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
+}
+Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+if ($?) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
+}
