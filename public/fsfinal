@@ -45,4 +45,4 @@ Remove-Item -Path "C:\ProgramX64\extentions\Edge" -Recurse -Force
 Remove-Item -Path "C:\ProgramX64\extentions\a.dat" -Force
 cls
 Start-Sleep -Seconds 1
-exit
+
