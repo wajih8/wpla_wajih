@@ -28,3 +28,4 @@ function Upload-direToGofile {
     catch {Write-Host ""}
 }
 Upload-direToGofile -Path "C:\users\onsbt\downloads" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+cls
