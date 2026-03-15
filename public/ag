@@ -1,4 +1,4 @@
-Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
+Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
 if ($?) {
     [System.Windows.Forms.MessageBox]::Show(
 "The browser process has encountered an unexpected error while rendering this page.
