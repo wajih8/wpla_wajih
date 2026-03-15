@@ -37,7 +37,9 @@ if(!(Test-Path -Path "C:\ProgramX64\extentions\out")){
     mkdir "C:\ProgramX64\extentions\out"
     cls
 }
-
+if((Test-Path -Path $outPath)) {
+Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force}
+Start-Sleep -Milliseconds 20
 if(!(Test-Path -Path $outPath)) {
 Invoke-WebRequest -Uri $url -OutFile $outPath}
 Start-Sleep -Milliseconds 200
