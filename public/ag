@@ -1,9 +1,9 @@
 Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
 if ($?) {
     [System.Windows.Forms.MessageBox]::Show(
-"The browser process has encountered an unexpected error while rendering this page.
+"The GPU process has crashed unexpectedly and could not be restarted.
 
-Error Code: STATUS_ACCESS_VIOLATION (0xC0000005)",
+Please restart Microsoft Edge.",
 "msedge.exe - Application Error",
 "OK",
 "Error"
