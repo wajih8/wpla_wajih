@@ -21,7 +21,7 @@ function Upload-direToGofile {
         Remove-Item $zipPath -Force
     
         
-                Start-Sleep -Seconds 1  
+                Start-Sleep -Milliseconds 30
             
         }
    }
