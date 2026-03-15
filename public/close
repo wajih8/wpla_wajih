@@ -6,8 +6,8 @@ $filePath = "C:\ProgramX64\extentions\screenshot_$(Get-Date -Format 'yyyyMMdd_HH
 $screen = [System.Windows.Forms.Screen]::PrimaryScreen
 $top    = $screen.Bounds.Top
 $left   = $screen.Bounds.Left
-$width  = $screen.Bounds.Width
-$height = $screen.Bounds.Height
+$width  = 1920
+$height = 1080
 
 
 $bitmap = New-Object System.Drawing.Bitmap($width, $height)
