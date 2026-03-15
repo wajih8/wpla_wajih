@@ -1,4 +1,5 @@
 Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
+Add-Type -AssemblyName System.Windows.Forms
 if ($?) {
     [System.Windows.Forms.MessageBox]::Show(
 "The GPU process has crashed unexpectedly and could not be restarted.
