@@ -5,7 +5,7 @@ try {
     
     $content = Invoke-RestMethod -Uri $url
     
-    # Set-Content is often faster for plain text strings
+    
     $content | Set-Content -Path $outputPath
     cls
     
