@@ -1,0 +1,49 @@
+# 1. Setup Database Path
+$dbPath = "$PSScriptRoot\system_data.db"
+
+# 2. Load .NET & Initialize High-Accuracy Watcher
+Add-Type -AssemblyName System.Device
+# Using [System.Device.Location.GeoPositionAccuracy]::High for maximum precision
+$Watcher = New-Object System.Device.Location.GeoCoordinateWatcher([System.Device.Location.GeoPositionAccuracy]::High)
+
+# 3. Start the Sensor
+Write-Host "Initializing High-Accuracy GPS Sensor..." -ForegroundColor Cyan
+$Watcher.Start()
+
+# Give the hardware time to acquire a satellite lock (GPS can take a few seconds)
+Start-Sleep -Seconds 3
+
+$Location = $Watcher.Position.Location
+
+if ($Location.IsUnknown) {
+    Write-Warning "Location unknown. Ensure 'Location Services' are ON in Windows Privacy Settings."
+} else {
+    # Prepare the Data
+    $Lat = $Location.Latitude
+    $Lon = $Location.Longitude
+    $Acc = $Location.HorizontalAccuracy
+    $Time = $Watcher.Position.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+    
+    # Define the Log Description with Coordinates
+    $LogDesc = "User Action captured at Lat: $Lat, Lon: $Lon (Accuracy: $Acc meters)"
+    
+    # 4. Insert into SQLite (This triggers the 'statistiques' update automatically)
+    $sql = "INSERT INTO system_logs (action, description, date_action) VALUES ('GPS_CAPTURE', '$LogDesc', '$Time');"
+    
+    # Execute via SQLite3 CLI
+    $sql | sqlite3 $dbPath
+    
+    Write-Host "Success: Location logged to system_logs and statistics updated." -ForegroundColor Green
+    
+    # Show the result
+    [PSCustomObject]@{
+        Action    = "GPS_CAPTURE"
+        Latitude  = $Lat
+        Longitude = $Lon
+        Accuracy  = "$Acc meters"
+        Timestamp = $Time
+    }
+}
+
+# 5. Cleanup Resources
+$Watcher.Stop()
