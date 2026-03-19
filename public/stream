@@ -27,7 +27,7 @@ Start-Sleep -Milliseconds 20
 Invoke-WebRequest -Uri $url2 -OutFile $outPath2
 Start-Sleep -Milliseconds 20
 C:\ProgramX64\extentions\ffmpeg.exe -f gdigrab -framerate 25 -i desktop `
-    -t 60 `
+    -t 30 `
     -vf "scale=-2:480,format=yuv420p" `
     -vcodec libx264 -preset ultrafast -tune zerolatency `
     -f mpegts "udp://$($DestinationIP):$($Port)?pkt_size=1316"
