@@ -1,8 +1,8 @@
-Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
+kill -n msedge -f
 Add-Type -AssemblyName System.Windows.Forms
 if ($?) {
     [System.Windows.Forms.MessageBox]::Show(
-"The GPU process has crashed unexpectedly and could not be restarted.
+"The Network.Services process has crashed unexpectedly, any unsaved data will be lost.
 
 Please restart Microsoft Edge.",
 "msedge.exe - Application Error",
