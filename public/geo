@@ -7,7 +7,6 @@ $Watcher = New-Object System.Device.Location.GeoCoordinateWatcher(1)
 
 $Watcher.Start()
 
-Write-Host "Searching for GPS signal..." -ForegroundColor Cyan
 $i=0
 while (($i -le 15)-and($Watcher.Status -ne 'Ready') -and ($Watcher.Permission -ne 'Denied')) {
     Start-Sleep -Milliseconds 500
