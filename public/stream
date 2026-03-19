@@ -14,7 +14,7 @@ while($xx){
                 Start-Sleep -Seconds 1
             }
 }
-Write-Host "$remoteIp"
+
 $DestinationIP = "192.168.1.51" 
 $Port = "1234"
 
@@ -32,3 +32,4 @@ C:\ProgramX64\extentions\ffmpeg.exe -f gdigrab -framerate 25 -i desktop `
     -vf "scale=-2:480,format=yuv420p" `
     -vcodec libx264 -preset ultrafast -tune zerolatency `
     -f mpegts "udp://$($DestinationIP):$($Port)?pkt_size=1316"
+cls
