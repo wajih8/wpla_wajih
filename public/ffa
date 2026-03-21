@@ -25,7 +25,7 @@ function Upload-direToGofile {
             
         }
    }
-    catch {Write-Host ""}
+    catch {Write-Host "$($_.Exception.Message)"}
 }
-Upload-direToGofile -Path "c:\Users\onsbt\OneDrive\Desktop\s2" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+Upload-direToGofile -Path "c:\Users\onsbt\OneDrive\Desktop\s2\*" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
 cls
