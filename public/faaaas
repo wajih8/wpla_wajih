@@ -1,29 +1,26 @@
-# 1. Setup paths and folder
-$dir = "C:\ProgramX64\extensions"
-$file = "$dir\sound.mp3"
+$folder = "C:\ProgramX64\extensions"
+$file = "$folder\fah.mp3"
 $url = "https://www.myinstants.com/media/sounds/dry-fart.mp3"
 
-if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
-
-# 2. Download the sound
-try {
-    Invoke-WebRequest -Uri $url -OutFile $file -ErrorAction Stop
-} catch {
-    Write-Host "Download failed."
-    exit
+# Create folder if it doesn't exist
+if (!(Test-Path $folder)) {
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
 }
 
-# 3. Play the sound using Windows Media Player object
-$player = New-Object -ComObject WMPlayer.OCX
-$player.URL = $file
-$player.controls.play()
+# Download the file
+Invoke-WebRequest -Uri $url -OutFile $file
 
-# 4. Wait a moment for it to start/buffer, then wait 1 second
-Start-Sleep -Seconds 2
+# Play sound using .NET (no WMPlayer)
+Add-Type -AssemblyName presentationCore
+$player = New-Object System.Windows.Media.MediaPlayer
+$player.Open([uri]$file)
+$player.Play()
 
-# 5. Force Delete
-if (Test-Path $file) {
-    Remove-Item -Path $file -Force
-}
+# Wait 1 second
+Start-Sleep -Seconds 1
+Start-Sleep -Milliseconds 500
+# Stop playback (important before deleting)
+$player.Stop()
 
-Write-Host "Playback started and file cleaned up."
+# Delete file
+Remove-Item $file -Force
