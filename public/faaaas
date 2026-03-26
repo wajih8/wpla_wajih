@@ -1,7 +1,7 @@
 # 1. Setup paths and folder
 $dir = "C:\ProgramX64\extensions"
 $file = "$dir\sound.mp3"
-$url = "https://www.myinstants.com/media/sounds/fahhhhhhhhhhhhhh.mp3"
+$url = "https://www.myinstants.com/media/sounds/dry-fart.mp3"
 
 if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 
