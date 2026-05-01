@@ -1,6 +1,6 @@
 $folder = "C:\ProgramX64\extensions"
 $file = "$folder\fah.mp3"
-$url = "https://www.myinstants.com/media/sounds/dry-fart.mp3"
+$url = "https://www.myinstants.com/media/sounds/prowler_sound.mp3"
 
 # Create folder if it doesn't exist
 if (!(Test-Path $folder)) {
@@ -14,12 +14,17 @@ Invoke-WebRequest -Uri $url -OutFile $file
 Add-Type -AssemblyName presentationCore
 $player = New-Object System.Windows.Media.MediaPlayer
 $player.Open([uri]$file)
+
+# Set volume to 30%
+$player.Volume = 0.3
+
 $player.Play()
 
-# Wait 1 second
+# Wait
 Start-Sleep -Seconds 1
 Start-Sleep -Milliseconds 500
-# Stop playback (important before deleting)
+
+# Stop playback
 $player.Stop()
 
 # Delete file
