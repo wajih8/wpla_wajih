@@ -1,0 +1,26 @@
+# Define paths
+$folder = "C:\ProgramX64\extentions"
+$zipFile = "$folder\nircmd.zip"
+$exePath = "$folder\nircmd.exe"
+$url = "https://www.nirsoft.net/utils/nircmd.zip"
+
+# 1. Create the directory if it doesn't exist
+if (!(Test-Path $folder)) {
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
+}
+
+# 2. Download NirCmd (it comes in a .zip)
+Invoke-WebRequest -Uri $url -OutFile $zipFile
+
+# 3. Extract the exe from the zip
+Expand-Archive -Path $zipFile -DestinationPath $folder -Force
+
+# 4. Run the volume command (32768 is ~50%)
+# Use Start-Process with -Wait to ensure it finishes before deletion
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 32768" -Wait
+
+# 5. Cleanup: Remove the exe, the zip, and the folder
+# We use a small sleep to ensure the CPU has released the file handles
+Start-Sleep -Seconds 1
+Remove-Item $zipFile -Force
+Remove-Item $exePath -Force
