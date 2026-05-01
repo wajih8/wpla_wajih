@@ -21,7 +21,7 @@ $player.Volume = 0.3
 $player.Play()
 
 # Wait
-Start-Sleep -Seconds 1
+Start-Sleep -Seconds 4
 Start-Sleep -Milliseconds 500
 
 # Stop playback
