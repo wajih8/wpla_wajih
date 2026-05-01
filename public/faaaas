@@ -16,7 +16,7 @@ $player = New-Object System.Windows.Media.MediaPlayer
 $player.Open([uri]$file)
 
 # Set volume to 30%
-$player.Volume = 0.1
+$player.Volume = 0.05
 
 $player.Play()
 
