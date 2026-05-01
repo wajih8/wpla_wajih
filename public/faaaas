@@ -15,8 +15,31 @@ Add-Type -AssemblyName presentationCore
 $player = New-Object System.Windows.Media.MediaPlayer
 $player.Open([uri]$file)
 
-# Set volume to 30%
-$player.Volume = 0.05
+# Define paths
+
+$zipFile = "$folder\nircmd.zip"
+$exePath = "$folder\nircmd.exe"
+$url = "https://www.nirsoft.net/utils/nircmd.zip"
+
+# 1. Create the directory if it doesn't exist
+if (!(Test-Path $folder)) {
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
+}
+
+
+Invoke-WebRequest -Uri $url -OutFile $zipFile
+
+Expand-Archive -Path $zipFile -DestinationPath $folder -Force
+
+# Use Start-Process with -Wait to ensure it finishes before deletion
+
+
+# 5. Cleanup: Remove the exe, the zip, and the folder
+# We use a small sleep to ensure the CPU has released the file handles
+
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 19660" -Wait
+Start-Sleep -Seconds 1
+
 
 $player.Play()
 
@@ -29,3 +52,6 @@ $player.Stop()
 
 # Delete file
 Remove-Item $file -Force
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 65535" -Wait
+Remove-Item $zipFile -Force
+Remove-Item $exePath -Force
