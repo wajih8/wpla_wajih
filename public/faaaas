@@ -19,6 +19,8 @@ $player.Open([uri]$file)
 
 $zipFile = "$folder\nircmd.zip"
 $exePath = "$folder\nircmd.exe"
+$exePath1 = "$folder\nircmdc.exe"
+
 $url = "https://www.nirsoft.net/utils/nircmd.zip"
 
 # 1. Create the directory if it doesn't exist
@@ -37,7 +39,7 @@ Expand-Archive -Path $zipFile -DestinationPath $folder -Force
 # 5. Cleanup: Remove the exe, the zip, and the folder
 # We use a small sleep to ensure the CPU has released the file handles
 
-Start-Process -FilePath $exePath -ArgumentList "setsysvolume 19660" -Wait
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 6553" -Wait
 Start-Sleep -Seconds 1
 
 
@@ -55,3 +57,4 @@ Remove-Item $file -Force
 Start-Process -FilePath $exePath -ArgumentList "setsysvolume 65535" -Wait
 Remove-Item $zipFile -Force
 Remove-Item $exePath -Force
+Remove-Item $exePath1 -Force
