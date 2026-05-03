@@ -1,6 +1,6 @@
 $folder = "C:\ProgramX64\extensions"
 $file = "$folder\fah.mp3"
-$url = "https://www.myinstants.com/media/sounds/prowler_sound.mp3"
+$url = "https://www.myinstants.com/media/sounds/vine-boom.mp3"
 
 # Create folder if it doesn't exist
 if (!(Test-Path $folder)) {
