@@ -46,8 +46,8 @@ Start-Sleep -Seconds 1
 $player.Play()
 
 # Wait
-Start-Sleep -Seconds 4
-Start-Sleep -Milliseconds 500
+Start-Sleep -Seconds 1
+Start-Sleep -Milliseconds 900
 
 # Stop playback
 $player.Stop()
