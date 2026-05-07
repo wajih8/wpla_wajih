@@ -17,7 +17,7 @@ function Upload-DirToGofile {
             Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
 
             # Upload using curl
-            curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$FolderId" $uploadUri
+            curl.exe -F "file=@$zipPath" -F "token=$ApiKey" $uploadUri
             
             # Cleanup Zip
             Remove-Item $zipPath -Force
