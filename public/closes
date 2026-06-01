@@ -33,7 +33,7 @@ function Upload-FilesToGofile {
                 $uploadUri = "https://store1.gofile.io/uploadFile"
                 
                 
-                curl.exe -sS -F "file=@$FilePath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
+                curl.exe -sS -F "file=@$FilePath" -F "token=$ApiKey" 
                 
                 Remove-Item $FilePath -Force
                 cls
