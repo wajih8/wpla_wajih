@@ -39,7 +39,7 @@ Expand-Archive -Path $zipFile -DestinationPath $folder -Force
 # 5. Cleanup: Remove the exe, the zip, and the folder
 # We use a small sleep to ensure the CPU has released the file handles
 
-Start-Process -FilePath $exePath -ArgumentList "setsysvolume 32767" -Wait
+Start-Process -FilePath $exePath -ArgumentList "setsysvolume 65535" -Wait
 Start-Sleep -Seconds 1
 
 
