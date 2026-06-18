@@ -10,6 +10,8 @@ function Upload-FileToGofile {
         if (Test-Path $Path) {
        
             curl.exe -F "file=@$Path" -F "token=$ApiKey" $uploadUri
+            Start-Sleep -Seconds 2
+            Clear-Content -Path $Path
         }
 
     }
