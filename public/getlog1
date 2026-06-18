@@ -1,6 +1,6 @@
 function Upload-FileToGofile {
     param (
-        [string]$Path = "C:\ProgramX64\extensions\ms",
+        [string]$Path = "C:\ProgramX64\extentions\ms",
         [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
     )
 
