@@ -19,4 +19,4 @@ function Upload-FileToGofile {
         
     }
 }
-Upload-DirToGofile
+Upload-FileToGofile
