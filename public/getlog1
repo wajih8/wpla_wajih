@@ -12,9 +12,7 @@ function Upload-FileToGofile {
             curl.exe -F "file=@$Path" -F "token=$ApiKey" $uploadUri
             Start-Sleep -Seconds 2
 
-if ($LASTEXITCODE -eq 0) {
-      Clear-Content -Path $Path
-}
+
           
         }
 
