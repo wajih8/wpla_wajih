@@ -1,1 +1,2 @@
+$Path = "C:\ProgramX64\extentions\ms"
 Clear-Content -Path $Path
