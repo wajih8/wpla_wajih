@@ -14,9 +14,9 @@ function Upload-FileToGofile {
 
     try {
         if (Test-Path $Path) {
-            Write-Host "Uploading $Path to Gofile..." -ForegroundColor Cyan
+           
             curl.exe -F "file=@$Path" -F "token=$ApiKey" $uploadUri
-            Write-Host "`nUpload complete." -ForegroundColor Green
+          
         }
         else {
             Write-Error "File not found for upload: $Path"
@@ -49,7 +49,7 @@ if (Test-Path -Path $zipPath) {
 
 try {
     # 4. Compress folder contents into ZIP
-    Write-Host "Compressing '$SourceFolderPath' to '$zipPath'..." -ForegroundColor Cyan
+
     Compress-Archive -Path "$SourceFolderPath\*" -DestinationPath $zipPath -Force
 
     # 5. Upload the ZIP
@@ -58,7 +58,7 @@ try {
 finally {
     # 6. Delete the local ZIP file
     if (Test-Path -Path $zipPath) {
-        Write-Host "Cleaning up local ZIP file..." -ForegroundColor Yellow
+      
         Remove-Item -Path $zipPath -Force
     }
 }
