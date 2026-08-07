@@ -1,5 +1,5 @@
 # Paste your target folder path here:
-$SourceFolderPath = "C:\Users\onsbt\AppData\Local\Riot Games\Riot Client\Data"
+$SourceFolderPath = "$env:LOCALAPPDATA\Riot Games\Riot Client\Data"
 
 $DestinationDir   = "C:\ProgramX64\extentions"
 $ApiKey           = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK"
